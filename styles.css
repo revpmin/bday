@@ -604,3 +604,62 @@ body {
         display: none;
     }
 }
+
+
+.music-button {
+    position: fixed;
+
+    right: 25px;
+    bottom: 25px;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+
+    border: 1px solid var(--red);
+
+    background: var(--paper);
+
+    color: var(--red);
+
+    font-size: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    box-shadow: 0 5px 15px rgba(50, 30, 20, 0.15);
+
+    transition:
+        transform 0.3s ease,
+        background 0.3s ease,
+        color 0.3s ease;
+
+    z-index: 100;
+}
+
+.music-button:hover {
+    transform: translateY(-3px);
+
+    background: var(--red);
+
+    color: white;
+}
+
+.music-button.needs-play {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}

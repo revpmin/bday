@@ -5,21 +5,21 @@ const birthdayMusic = document.getElementById("birthdayMusic");
 const musicButton = document.getElementById("musicButton");
 
 
-envelope.addEventListener("click", () => {
 
-    // Iniciar música
-    birthdayMusic.play()
-        .then(() => {
-            musicButton.textContent = "♫";
-        })
-        .catch((error) => {
-            console.log("No se pudo reproducir la música:", error);
-        });
-
+envelope.addEventListener("click", function () {
 
     // Abrir sobre
     envelope.classList.add("open");
 
+    // Reproducir canción
+    birthdayMusic.play()
+        .then(() => {
+            console.log("Música reproduciéndose");
+            musicButton.textContent = "♫";
+        })
+        .catch((error) => {
+            console.error("Error al reproducir la música:", error);
+        });
 
     // Mostrar carta
     setTimeout(() => {
@@ -41,9 +41,11 @@ envelope.addEventListener("click", () => {
 
 
 
-musicButton.addEventListener("click", (event) => {
+musicButton.addEventListener("click", function (event) {
 
-    // Evita que el clic afecte al resto de la página
+    // Muy importante:
+    // evita que el clic del botón se interprete
+    // como un clic en el resto de la página
     event.stopPropagation();
 
     if (birthdayMusic.paused) {
@@ -51,20 +53,12 @@ musicButton.addEventListener("click", (event) => {
         birthdayMusic.play();
 
         musicButton.textContent = "♫";
-        musicButton.setAttribute(
-            "aria-label",
-            "Pausar música"
-        );
 
     } else {
 
         birthdayMusic.pause();
 
         musicButton.textContent = "▶";
-        musicButton.setAttribute(
-            "aria-label",
-            "Reproducir música"
-        );
 
     }
 

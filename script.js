@@ -5,60 +5,67 @@ const birthdayMusic = document.getElementById("birthdayMusic");
 const musicButton = document.getElementById("musicButton");
 
 
-// =========================
-// MÚSICA
-// =========================
+envelope.addEventListener("click", () => {
 
-// Intentar iniciar la canción al cargar la página
-window.addEventListener("load", () => {
-    birthdayMusic.play().catch(() => {
-        // El navegador bloqueó el autoplay.
-        // Se podrá iniciar mediante el botón.
-        musicButton.classList.add("needs-play");
-    });
+    // Iniciar música
+    birthdayMusic.play()
+        .then(() => {
+            musicButton.textContent = "♫";
+        })
+        .catch((error) => {
+            console.log("No se pudo reproducir la música:", error);
+        });
+
+
+    // Abrir sobre
+    envelope.classList.add("open");
+
+
+    // Mostrar carta
+    setTimeout(() => {
+
+        birthdayCard.classList.add("visible");
+
+        setTimeout(() => {
+
+            birthdayCard.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }, 300);
+
+    }, 700);
+
 });
 
 
-// Botón de música
-musicButton.addEventListener("click", () => {
+
+musicButton.addEventListener("click", (event) => {
+
+    // Evita que el clic afecte al resto de la página
+    event.stopPropagation();
 
     if (birthdayMusic.paused) {
 
         birthdayMusic.play();
 
         musicButton.textContent = "♫";
-        musicButton.setAttribute("aria-label", "Pausar música");
+        musicButton.setAttribute(
+            "aria-label",
+            "Pausar música"
+        );
 
     } else {
 
         birthdayMusic.pause();
 
         musicButton.textContent = "▶";
-        musicButton.setAttribute("aria-label", "Reproducir música");
+        musicButton.setAttribute(
+            "aria-label",
+            "Reproducir música"
+        );
+
     }
-
-});
-
-
-// =========================
-// SOBRE
-// =========================
-
-envelope.addEventListener("click", () => {
-
-    envelope.classList.add("open");
-
-    setTimeout(() => {
-
-        birthdayCard.classList.add("visible");
-
-        setTimeout(() => {
-            birthdayCard.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }, 300);
-
-    }, 700);
 
 });

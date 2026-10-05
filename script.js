@@ -1,76 +1,61 @@
 const envelope = document.getElementById("envelope");
 const birthdayCard = document.getElementById("birthdayCard");
-
 const birthdayMusic = document.getElementById("birthdayMusic");
 const musicButton = document.getElementById("musicButton");
 
-// Bandera para saber si ya arrancamos la música por primera vez
 let musicStarted = false;
 
-// -----------------------------------------------------------
-// 1. Clic en cualquier parte de la pantalla → reproducir música
-// -----------------------------------------------------------
-function startMusicOnce() {
-    // Solo la primera vez
+function tryPlayMusic(source = "global") {
     if (musicStarted) return;
 
-    birthdayMusic.play()
-        .then(() => {
-            console.log("Música reproduciéndose");
-            musicStarted = true;
-            musicButton.textContent = "♫";
-            // Una vez iniciada, quitamos el listener global
-            document.removeEventListener("click", startMusicOnce);
-        })
-        .catch((error) => {
-            console.error("Error al reproducir la música:", error);
-            // No marcamos musicStarted para permitir reintentar
-        });
-}
+    // Desmutear y resetear volumen por si acaso
+    birthdayMusic.muted = false;
+    if (birthdayMusic.volume === 0) birthdayMusic.volume = 1;
 
-document.addEventListener("click", startMusicOnce);
+    const attempt = birthdayMusic.play();
 
-// -----------------------------------------------------------
-// 2. Clic en el sobre → abrir carta + asegurar música
-// -----------------------------------------------------------
-envelope.addEventListener("click", function () {
-    // Abrir sobre
-    envelope.classList.add("open");
-
-    // Intentar reproducir la música (por si el clic global no lo hizo aún)
-    if (!musicStarted) {
-        birthdayMusic.play()
+    if (attempt !== undefined) {
+        attempt
             .then(() => {
-                console.log("Música reproduciéndose desde el sobre");
+                console.log(`✅ Música iniciada desde: ${source}`);
                 musicStarted = true;
                 musicButton.textContent = "♫";
-                document.removeEventListener("click", startMusicOnce);
+                window.removeEventListener("click", globalClickHandler, true);
+                window.removeEventListener("touchstart", globalClickHandler, true);
             })
-            .catch((error) => {
-                console.error("Error al reproducir la música:", error);
+            .catch((err) => {
+                console.warn(`⚠️ Play rechazado desde ${source}:`, err.name);
             });
     }
+}
 
-    // Mostrar carta
+function globalClickHandler(e) {
+    // Ignoramos clics en el botón de música (él se maneja solo)
+    if (e.target === musicButton || musicButton.contains(e.target)) return;
+    tryPlayMusic("global");
+}
+
+// Listener global en fase de captura (funciona aunque haya stopPropagation)
+window.addEventListener("click", globalClickHandler, true);
+// Soporte para móviles
+window.addEventListener("touchstart", globalClickHandler, true);
+
+// Clic en el sobre
+envelope.addEventListener("click", () => {
+    envelope.classList.add("open");
+    tryPlayMusic("envelope");
+
     setTimeout(() => {
         birthdayCard.classList.add("visible");
-
         setTimeout(() => {
-            birthdayCard.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
+            birthdayCard.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 300);
     }, 700);
 });
 
-// -----------------------------------------------------------
-// 3. Botón de música → pausar / reanudar
-// -----------------------------------------------------------
-musicButton.addEventListener("click", function (event) {
-    // Evita que el clic del botón dispare el listener global
+// Botón de música: pausa / reanuda
+musicButton.addEventListener("click", (event) => {
     event.stopPropagation();
-
     if (birthdayMusic.paused) {
         birthdayMusic.play();
         musicButton.textContent = "♫";
